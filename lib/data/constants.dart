@@ -10,3 +10,26 @@ List<String> chipsFilter = [
   'Travel',
   'Education',
 ];
+
+List<String> contentLocations = [
+  'Tanzania',
+  'Kenya',
+  'Uganda',
+  'Rwanda',
+  'Burundi',
+  'Sudan',
+  'Somalia',
+  'Ethiopia',
+  'Sierra Leone',
+  'Mozambique',
+  'Zambia',
+  'Zimbabwe',
+  'Malawi',
+  'Mauritius',
+  'Madagascar',
+  'Mali',
+  'Mauritania',
+  'Maldives',
+  'Malaysia',
+  'Malta',
+];

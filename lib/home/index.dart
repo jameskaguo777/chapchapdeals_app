@@ -11,6 +11,7 @@ class HomeIndex extends StatefulWidget {
 }
 
 class _HomeIndexState extends State<HomeIndex> {
+  String dropdownValue = 'Tanzania';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,7 +52,15 @@ class _HomeIndexState extends State<HomeIndex> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(13.0, 0.0, 0.0, 8.0),
                 child: _filterChips(),
-              )
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(13.0, 8.0, 13.0, 13.0),
+                child: _contentLocations(),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(13.0, 8.0, 13.0, 13.0),
+                child: _contentCategories(),
+              ),
             ]),
       ),
     );
@@ -80,4 +89,85 @@ class _HomeIndexState extends State<HomeIndex> {
           ],
         ),
       );
+
+  Widget _contentLocations() => SizedBox(
+        width: double.infinity,
+        height: 60,
+        child: DropdownButtonFormField(
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.location_on),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(20),
+                borderSide: BorderSide(color: Colors.grey[300]!),
+              ),
+              hintText: 'Select Location',
+              hintStyle: Theme.of(context).textTheme.caption,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            icon: const Icon(
+              Icons.arrow_downward_rounded,
+              color: Colors.green,
+            ),
+            isExpanded: true,
+            value: dropdownValue,
+            items: contentLocations.map((e) {
+              return DropdownMenuItem(value: e, child: Text(e));
+            }).toList(),
+            onChanged: (String? newValue) => setState(() {
+                  dropdownValue = newValue!;
+                })),
+      );
+
+  Widget _contentCategories() => SizedBox(
+    width: double.infinity,
+    height: 160,
+    child: Column(
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Real Estate', style: Theme.of(context).textTheme.headline6),
+            TextButton(onPressed: () => null,
+             child: Wrap(
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: const [
+                Text('See All'),
+                SizedBox(width: 5,),
+                Icon(Icons.arrow_forward_ios, size: 15,),
+              ],
+            
+            )),
+          ],
+        )
+      
+
+      ],
+    ),
+  );
+
+  Widget _listItemCards(){
+    return SizedBox(
+      width: double.infinity,
+      height: 160,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: [
+          ...listItemCards.map((e) => Padding(
+                padding: const EdgeInsets.all(3.0),
+                child: Card(
+                  child: Column(
+                    children: [
+                      Image.asset(e.image),
+                      Text(e.title),
+                      Text(e.subtitle),
+                    ],
+                  ),
+                ),
+              )),
+        ],
+      ),
+    );
+  }
 }
