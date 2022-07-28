@@ -1,7 +1,9 @@
 import 'package:chapchapdeals_app/data/constants.dart';
+import 'package:chapchapdeals_app/data/controller/posts_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:get/get.dart';
 
 class HomeIndex extends StatefulWidget {
   const HomeIndex({Key? key}) : super(key: key);
@@ -12,6 +14,14 @@ class HomeIndex extends StatefulWidget {
 
 class _HomeIndexState extends State<HomeIndex> {
   String dropdownValue = 'Tanzania';
+  final PostsController _postsController = Get.put(PostsController());
+
+  @override
+  void initState() {
+    super.initState();
+    _postsController.getPosts();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,53 +129,57 @@ class _HomeIndexState extends State<HomeIndex> {
       );
 
   Widget _contentCategories() => SizedBox(
-    width: double.infinity,
-    height: 160,
-    child: Column(
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        width: double.infinity,
+        height: 160,
+        child: Column(
           children: [
-            Text('Real Estate', style: Theme.of(context).textTheme.headline6),
-            TextButton(onPressed: () => null,
-             child: Wrap(
-              alignment: WrapAlignment.center,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: const [
-                Text('See All'),
-                SizedBox(width: 5,),
-                Icon(Icons.arrow_forward_ios, size: 15,),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Real Estate',
+                    style: Theme.of(context).textTheme.headline6),
+                TextButton(
+                    onPressed: () => null,
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: const [
+                        Text('See All'),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          size: 15,
+                        ),
+                      ],
+                    )),
               ],
-            
-            )),
+            )
           ],
-        )
-      
+        ),
+      );
 
-      ],
-    ),
-  );
-
-  Widget _listItemCards(){
+  Widget _listItemCards() {
     return SizedBox(
       width: double.infinity,
       height: 160,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          ...listItemCards.map((e) => Padding(
-                padding: const EdgeInsets.all(3.0),
-                child: Card(
-                  child: Column(
-                    children: [
-                      Image.asset(e.image),
-                      Text(e.title),
-                      Text(e.subtitle),
-                    ],
-                  ),
-                ),
-              )),
+          // ...listItemCards.map((e) => Padding(
+          //       padding: const EdgeInsets.all(3.0),
+          //       child: Card(
+          //         child: Column(
+          //           children: [
+          //             Image.asset(e.image),
+          //             Text(e.title),
+          //             Text(e.subtitle),
+          //           ],
+          //         ),
+          //       ),
+          //     )),
         ],
       ),
     );

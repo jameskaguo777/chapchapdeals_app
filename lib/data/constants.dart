@@ -1,4 +1,6 @@
-List<String> chipsFilter = [
+
+
+const List<String> chipsFilter = [
   'Jobs',
   'Cars',
   'Real Estate',
@@ -11,7 +13,7 @@ List<String> chipsFilter = [
   'Education',
 ];
 
-List<String> contentLocations = [
+const List<String> contentLocations = [
   'Tanzania',
   'Kenya',
   'Uganda',
