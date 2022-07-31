@@ -1,6 +1,8 @@
 import 'package:chapchapdeals_app/home/index.dart';
 import 'package:flutter/material.dart';
 
+import 'initials/index.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -16,9 +18,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/',
+      initialRoute: '/initials',
       routes: {
-        '/' :(context) => HomeIndex(),
+        '/initials': (context) => const InitialsIndex(),
+        '/' :(context) => const HomeIndex(),
       },
     );
   }

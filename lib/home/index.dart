@@ -1,8 +1,9 @@
 import 'package:chapchapdeals_app/data/constants.dart';
+import 'package:chapchapdeals_app/data/controller/categories_controller.dart';
 import 'package:chapchapdeals_app/data/controller/posts_controller.dart';
+import 'package:chapchapdeals_app/data/model/categories.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 
 class HomeIndex extends StatefulWidget {
@@ -15,11 +16,14 @@ class HomeIndex extends StatefulWidget {
 class _HomeIndexState extends State<HomeIndex> {
   String dropdownValue = 'Tanzania';
   final PostsController _postsController = Get.put(PostsController());
+  final CategoriesController _categoriesController =
+      Get.put(CategoriesController());
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
-    _postsController.getPosts();
+    _categoriesController.getCategories();
   }
 
   @override
@@ -48,6 +52,7 @@ class _HomeIndexState extends State<HomeIndex> {
         ],
       ),
       body: SingleChildScrollView(
+        key: _scaffoldKey,
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -69,7 +74,7 @@ class _HomeIndexState extends State<HomeIndex> {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(13.0, 8.0, 13.0, 13.0),
-                child: _contentCategories(),
+                child: _categoriesItems(),
               ),
             ]),
       ),
@@ -82,6 +87,7 @@ class _HomeIndexState extends State<HomeIndex> {
         child: ListView(
           scrollDirection: Axis.horizontal,
           children: [
+
             ...chipsFilter.map((e) => Padding(
                   padding: const EdgeInsets.all(3.0),
                   child: Chip(
@@ -128,39 +134,6 @@ class _HomeIndexState extends State<HomeIndex> {
                 })),
       );
 
-  Widget _contentCategories() => SizedBox(
-        width: double.infinity,
-        height: 160,
-        child: Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Real Estate',
-                    style: Theme.of(context).textTheme.headline6),
-                TextButton(
-                    onPressed: () => null,
-                    child: Wrap(
-                      alignment: WrapAlignment.center,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: const [
-                        Text('See All'),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Icon(
-                          Icons.arrow_forward_ios,
-                          size: 15,
-                        ),
-                      ],
-                    )),
-              ],
-            )
-          ],
-        ),
-      );
-
   Widget _listItemCards() {
     return SizedBox(
       width: double.infinity,
@@ -184,4 +157,53 @@ class _HomeIndexState extends State<HomeIndex> {
       ),
     );
   }
+
+  Widget _categoriesItems() {
+    return GetX<CategoriesController>(builder: (_) {
+      if (_categoriesController.isLoading.value) {
+        return const Center(child: CupertinoActivityIndicator());
+      } else {
+        return ListView.builder(
+            itemCount: _categoriesController.categories.length,
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (itemBuilder, index) {
+              return _contentCategories(_categoriesController.categories[index]);
+            });
+      }
+    });
+  }
+
+  Widget _contentCategories(CategoriesModel model) => SizedBox(
+        width: double.infinity,
+        height: 160,
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(model.name!, style: Theme.of(context).textTheme.headline6),
+                TextButton(
+                    onPressed: () => null,
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: const [
+                        Text('See All'),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          size: 15,
+                        ),
+                      ],
+                    )),
+              ],
+            )
+          ],
+        ),
+      );
 }
