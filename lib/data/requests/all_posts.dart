@@ -24,7 +24,7 @@ class PostRequests {
       String country, String category) async {
     try {
       Response response = await Dio().get(
-        postsByLocationAndCategory
+        postsByLocationAndCategoryUrl
             .replaceAll('country', country)
             .replaceAll('category', category),
       );

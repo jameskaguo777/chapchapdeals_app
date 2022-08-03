@@ -2,6 +2,7 @@ import 'package:chapchapdeals_app/home/index.dart';
 import 'package:flutter/material.dart';
 
 import 'initials/index.dart';
+import 'initials/initial_country.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,9 +22,9 @@ class MyApp extends StatelessWidget {
       initialRoute: '/initials',
       routes: {
         '/initials': (context) => const InitialsIndex(),
+        '/initials/country': (context) => const InitializeCountry(),
         '/' :(context) => const HomeIndex(),
       },
     );
   }
 }
-

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../api.dart';
 import '../model/countries.dart';
@@ -20,4 +21,17 @@ class CountriesRequests {
       return [];
     }
   }
+
+  static Future<String> getPrefferedCountry() async {
+    return (await SharedPreferences.getInstance()).getString('country') ?? '';
+  }
+
+  static String getCountryFlagImage(String countryCode) {
+    return getCountryFlagImageUrl.replaceAll('countryCode', countryCode);
+  }
+
+  static Future<bool> setPrefferedCountry(String country) async {
+    return (await SharedPreferences.getInstance()).setString('country', country);
+  }
+  
 }
