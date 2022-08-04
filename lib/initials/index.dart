@@ -18,7 +18,7 @@ class _InitialsIndexState extends State<InitialsIndex> {
   @override
   void initState() {
     super.initState();
-    _countriesController.getPrefferedCountry();
+    
   }
 
   @override
@@ -54,7 +54,10 @@ class _InitialsIndexState extends State<InitialsIndex> {
               if (_countriesController.isLoading.value) {
                 return const CupertinoActivityIndicator();
               } else {
-                _deciderForCountry();
+                Future.delayed(const Duration(milliseconds: 500), () {
+                  _deciderForCountry();
+                });
+                
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -71,13 +74,13 @@ class _InitialsIndexState extends State<InitialsIndex> {
 
   void _deciderForCountry() {
     if (_countriesController.prefferedCountry.value == '') {
-      Future.delayed(const Duration(milliseconds: 500), () {
+      Future.delayed(const Duration(milliseconds: 300), () {
         Navigator.pushNamedAndRemoveUntil(
             context, '/initials/country', (_) => false);
       });
     } else {
-      Future.delayed(const Duration(milliseconds: 500), () {
-        Navigator.pushNamedAndRemoveUntil(context, '/', (_) => false);
+      Future.delayed(const Duration(milliseconds: 300), () {
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
       });
     }
   }

@@ -1,10 +1,14 @@
 import 'package:chapchapdeals_app/data/constants.dart';
 import 'package:chapchapdeals_app/data/controller/categories_controller.dart';
+import 'package:chapchapdeals_app/data/controller/countries.dart';
 import 'package:chapchapdeals_app/data/controller/posts_controller.dart';
 import 'package:chapchapdeals_app/data/model/categories.dart';
+import 'package:chapchapdeals_app/data/model/countries.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../data/model/posts.dart';
 
 class HomeIndex extends StatefulWidget {
   const HomeIndex({Key? key}) : super(key: key);
@@ -14,16 +18,18 @@ class HomeIndex extends StatefulWidget {
 }
 
 class _HomeIndexState extends State<HomeIndex> {
-  String dropdownValue = 'Tanzania';
+  String dropdownValue = 'TZ';
   final PostsController _postsController = Get.put(PostsController());
   final CategoriesController _categoriesController =
       Get.put(CategoriesController());
+  final CountriesController _countriesController = Get.find();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
     _categoriesController.getCategories();
+    dropdownValue = _countriesController.prefferedCountry.value;
   }
 
   @override
@@ -66,11 +72,30 @@ class _HomeIndexState extends State<HomeIndex> {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(13.0, 0.0, 0.0, 8.0),
-                child: _filterChips(),
+                child: Obx(() {
+                  if (_categoriesController.isLoading.value) {
+                    return const Center(
+                        child: CupertinoActivityIndicator(
+                      color: Colors.green,
+                    ));
+                  } else {
+                    return _filterChips(
+                        _categoriesController.categories.reversed.toList());
+                  }
+                }),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(13.0, 8.0, 13.0, 13.0),
-                child: _contentLocations(),
+                child: Obx(() {
+                  if (_countriesController.isLoading.value) {
+                    return const Center(
+                        child: CupertinoActivityIndicator(
+                      color: Colors.green,
+                    ));
+                  } else {
+                    return _contentLocations(_countriesController.countries);
+                  }
+                }),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(13.0, 8.0, 13.0, 13.0),
@@ -81,17 +106,16 @@ class _HomeIndexState extends State<HomeIndex> {
     );
   }
 
-  Widget _filterChips() => SizedBox(
+  Widget _filterChips(List<CategoriesModel> categoriesModelList) => SizedBox(
         width: double.infinity,
         height: 50,
         child: ListView(
           scrollDirection: Axis.horizontal,
           children: [
-
-            ...chipsFilter.map((e) => Padding(
+            ...categoriesModelList.map((e) => Padding(
                   padding: const EdgeInsets.all(3.0),
                   child: Chip(
-                    label: Text(e),
+                    label: Text(e.name!),
                     backgroundColor: Colors.grey[200],
                     side: BorderSide(
                       color: Colors.grey[300]!,
@@ -106,7 +130,7 @@ class _HomeIndexState extends State<HomeIndex> {
         ),
       );
 
-  Widget _contentLocations() => SizedBox(
+  Widget _contentLocations(List<CountriesModel> countryModelList) => SizedBox(
         width: double.infinity,
         height: 60,
         child: DropdownButtonFormField(
@@ -126,11 +150,15 @@ class _HomeIndexState extends State<HomeIndex> {
             ),
             isExpanded: true,
             value: dropdownValue,
-            items: contentLocations.map((e) {
-              return DropdownMenuItem(value: e, child: Text(e));
-            }).toList(),
+            items: countryModelList
+                .map((e) => DropdownMenuItem(
+                      value: e.code,
+                      child: Text(e.name!),
+                    ))
+                .toList(),
             onChanged: (String? newValue) => setState(() {
                   dropdownValue = newValue!;
+                  _countriesController.setPrefferedCountry(dropdownValue);
                 })),
       );
 
@@ -169,13 +197,36 @@ class _HomeIndexState extends State<HomeIndex> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (itemBuilder, index) {
-              return _contentCategories(_categoriesController.categories[index]);
+              CategoriesModel categoriesModel =
+                  _categoriesController.categories[index];
+
+              late List<PostsModel> postsModelList = [];
+              _postsController
+                  .getPostsByCategoryLocation((categoriesModel.id.toString()),
+                      _countriesController.prefferedCountry.value)
+                  .then((value) {
+                postsModelList = value;
+              });
+              return Obx((){
+                if (_postsController.isLoading.value) {
+                  return const Center(
+                      child: CupertinoActivityIndicator(
+                    color: Colors.green,
+                  ));
+                } else {
+                  return _contentCategories(categoriesModel, postsModelList);
+                }
+                  
+                
+              });
             });
       }
     });
   }
 
-  Widget _contentCategories(CategoriesModel model) => SizedBox(
+  Widget _contentCategories(
+          CategoriesModel model, List<PostsModel> postModelList) =>
+      SizedBox(
         width: double.infinity,
         height: 160,
         child: Column(
@@ -202,8 +253,25 @@ class _HomeIndexState extends State<HomeIndex> {
                       ],
                     )),
               ],
-            )
+            ),
+            ...postModelList.map((e) {
+              return _contentPost(e);
+            })
           ],
         ),
       );
+
+  Widget _contentPost(PostsModel postModel) {
+    return Container(
+      width: 160,
+      height: 160,
+      color: Colors.black,
+      child: Column(
+        children: [
+          Text(postModel.title!),
+          Text(postModel.description!),
+        ],
+      ),
+    );
+  }
 }

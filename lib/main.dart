@@ -19,11 +19,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/initials',
+      initialRoute: '/',
       routes: {
-        '/initials': (context) => const InitialsIndex(),
+        '/': (context) => const InitialsIndex(),
         '/initials/country': (context) => const InitializeCountry(),
-        '/' :(context) => const HomeIndex(),
+        '/home' :(context) => const HomeIndex(),
       },
     );
   }

@@ -14,19 +14,14 @@ class CountriesController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    getPrefferedCountry();
     getCountries();
     getImageFlagCountry('TZ');
   }
 
   void getCountries() async {
-    if (kDebugMode) {
-      print('getCountries');
-    }
     isLoading.toggle();
     countries.value = await CountriesRequests.getCountries();
-    if (kDebugMode) {
-      print(countries.length);
-    }
     isLoading.toggle();
   }
 
@@ -44,7 +39,8 @@ class CountriesController extends GetxController {
 
   void setPrefferedCountry(String country) async {
     isLoading.toggle();
-    isPrefferedCountrySet.value = await CountriesRequests.setPrefferedCountry(country);
+    isPrefferedCountrySet.value =
+        await CountriesRequests.setPrefferedCountry(country);
     isLoading.toggle();
   }
 }

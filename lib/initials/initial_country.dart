@@ -1,9 +1,7 @@
 import 'package:chapchapdeals_app/data/model/countries.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../data/controller/countries.dart';
 
 class InitializeCountry extends StatefulWidget {
@@ -77,7 +75,7 @@ class _InitializeCountryState extends State<InitializeCountry> {
               onPressed: () {
                 _countriesController.setPrefferedCountry(dropdownValue);
 
-                Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+                Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
               },
               child: Obx((){
                 if (_countriesController.isLoading.value) {

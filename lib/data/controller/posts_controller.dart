@@ -6,11 +6,18 @@ import '../model/posts.dart';
 
 class PostsController extends GetxController {
   var posts = <PostsModel>[].obs;
+  RxBool isLoading = false.obs;
 
   void getPosts() async {
     posts.value = await PostRequests.getAllPosts();
     if (kDebugMode) {
       print(posts.elementAt(1).description);
     }
+  }
+
+  Future<List<PostsModel>> getPostsByCategoryLocation(String categoryID, String country)async{
+    // isLoading.toggle();
+    return await PostRequests.getPostsByLocationAndCategory(country, categoryID);
+    // isLoading.toggle();
   }
 }
