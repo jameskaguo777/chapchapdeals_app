@@ -1,4 +1,3 @@
-import 'package:chapchapdeals_app/data/constants.dart';
 import 'package:chapchapdeals_app/data/controller/categories_controller.dart';
 import 'package:chapchapdeals_app/data/controller/countries.dart';
 import 'package:chapchapdeals_app/data/controller/posts_controller.dart';
@@ -30,6 +29,8 @@ class _HomeIndexState extends State<HomeIndex> {
     super.initState();
     _categoriesController.getCategories();
     dropdownValue = _countriesController.prefferedCountry.value;
+    
+    _postsController.getPostsByLocation(dropdownValue);
   }
 
   @override
@@ -199,36 +200,28 @@ class _HomeIndexState extends State<HomeIndex> {
             itemBuilder: (itemBuilder, index) {
               CategoriesModel categoriesModel =
                   _categoriesController.categories[index];
+              return _contentCategories(categoriesModel);
+              // return Obx(() {
+              //   _postsController.getPostsByCategoryLocation(
+              //       (categoriesModel.id.toString()),
+              //       _countriesController.prefferedCountry.value);
+              //   if (_postsController.isLoading.value) {
+              //     return const Center(
+              //         child: CupertinoActivityIndicator(
+              //       color: Colors.green,
+              //     ));
+              //   } else {
 
-              late List<PostsModel> postsModelList = [];
-              _postsController
-                  .getPostsByCategoryLocation((categoriesModel.id.toString()),
-                      _countriesController.prefferedCountry.value)
-                  .then((value) {
-                postsModelList = value;
-              });
-              return Obx((){
-                if (_postsController.isLoading.value) {
-                  return const Center(
-                      child: CupertinoActivityIndicator(
-                    color: Colors.green,
-                  ));
-                } else {
-                  return _contentCategories(categoriesModel, postsModelList);
-                }
-                  
-                
-              });
+              //   }
+              // });
             });
       }
     });
   }
 
-  Widget _contentCategories(
-          CategoriesModel model, List<PostsModel> postModelList) =>
-      SizedBox(
+  Widget _contentCategories(CategoriesModel model) => SizedBox(
         width: double.infinity,
-        height: 160,
+        height: 200,
         child: Column(
           children: [
             Row(
@@ -254,9 +247,35 @@ class _HomeIndexState extends State<HomeIndex> {
                     )),
               ],
             ),
-            ...postModelList.map((e) {
-              return _contentPost(e);
-            })
+            Obx(() {
+              if (_postsController.isLoading.value) {
+                return const Center(
+                    child: CupertinoActivityIndicator(
+                  color: Colors.green,
+                ));
+              } else {
+                List<PostsModel> listPostsModel = _postsController.posts
+                    .where((p0) => p0.cid == model.id.toString())
+                    .toList();
+
+                return SizedBox(
+                  width: double.infinity,
+                  height: 150,
+                  child: ListView.builder(
+                      key: widget.key,
+                      itemCount: listPostsModel.length,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          width: 150,
+                          height: 150,
+                          color: Colors.black,
+                          child: Text(listPostsModel[index].title!),
+                        );
+                      }),
+                );
+              }
+            }),
           ],
         ),
       );

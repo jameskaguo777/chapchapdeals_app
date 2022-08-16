@@ -1,4 +1,4 @@
-import 'package:chapchapdeals_app/data/requests/all_posts.dart';
+import 'package:chapchapdeals_app/data/requests/posts.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
@@ -15,9 +15,22 @@ class PostsController extends GetxController {
     }
   }
 
-  Future<List<PostsModel>> getPostsByCategoryLocation(String categoryID, String country)async{
-    // isLoading.toggle();
-    return await PostRequests.getPostsByLocationAndCategory(country, categoryID);
-    // isLoading.toggle();
+  void getPostsByLocation(String country) async {
+    isLoading.toggle();
+    posts.value = await PostRequests.getPostsByLocation(country);
+    
+    isLoading.toggle();
+  }
+
+  void getPostsByCategoryLocation(String categoryID, String country) async {
+    isLoading.toggle();
+    posts.value =
+        await PostRequests.getPostsByLocationAndCategory(country, categoryID);
+    isLoading.toggle();
+  }
+
+  Future<List<PostsModel>> getRPostsByCatLoc(
+      String catID, String country) async {
+    return await PostRequests.getPostsByLocationAndCategory(country, catID);
   }
 }

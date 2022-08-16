@@ -1,5 +1,3 @@
-
-
 import 'package:chapchapdeals_app/data/model/pictures.dart';
 
 class PostsModel {
@@ -22,19 +20,27 @@ class PostsModel {
       this.price,
       this.title});
 
-  PostsModel.fromJson(Map<String, dynamic> json) {
-    postID = json['postid'];
-    cid = json['cid'];
-    title = json['title'];
-    price = json['price'];
-    description = json['description'];
-    createdAt = json['created_at'];
-    address = json['address'];
-    if (json['picture'] != null) {
-      images = <PicturesModel>[];
-      json['picture'].forEach((v) {
-        images?.add(PicturesModel.fromJson(v));
-      });
-    }
+  factory PostsModel.fromJson(Map<String, dynamic> json) {
+    return PostsModel(
+      postID : json['postid'],
+    cid : json['cid'],
+    title : json['title'],
+    price : json['price'],
+    description : json['description'],
+    createdAt : json['created_at'],
+    address : json['address'],
+    images: json['picture'] != null
+        ? (json['picture'] as List)
+            .map((e) => PicturesModel.fromJson(e as Map<String, dynamic>))
+            .toList()
+        : null,
+    
+    );
   }
 }
+// (if (json['picture'] != null) {
+//       images = <PicturesModel>[];
+//       json['picture'].forEach((v) {
+//         images?.add(PicturesModel.fromJson(v));
+//       });
+//     })
