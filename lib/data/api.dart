@@ -1,4 +1,5 @@
 const String baseUrl = 'https://chapchapdeals.com/api/v1/';
+const String domainUrl = 'https://chapchapdeals.com';
 const String postsUrl = '${baseUrl}latestads';
 const String countriesUrl = '${baseUrl}all/countries';
 const String categoriesUrl = '${baseUrl}categories';

@@ -7,6 +7,7 @@ import '../requests/countries.dart';
 class CountriesController extends GetxController {
   var countries = <CountriesModel>[].obs;
   RxString prefferedCountry = ''.obs;
+  RxString prefferedCurreny = ''.obs;
   RxBool isLoading = false.obs;
   RxString countryFlagImage = ''.obs;
   RxBool isPrefferedCountrySet = false.obs;
@@ -16,12 +17,15 @@ class CountriesController extends GetxController {
     super.onInit();
     getPrefferedCountry();
     getCountries();
+
     getImageFlagCountry('TZ');
   }
 
   void getCountries() async {
     isLoading.toggle();
     countries.value = await CountriesRequests.getCountries();
+    setCountryCurrency();
+    getCountryCurrency();
     isLoading.toggle();
   }
 
@@ -41,6 +45,19 @@ class CountriesController extends GetxController {
     isLoading.toggle();
     isPrefferedCountrySet.value =
         await CountriesRequests.setPrefferedCountry(country);
+    isLoading.toggle();
+  }
+
+  void setCountryCurrency() {
+    CountriesRequests.getPrefferedCountry().then((value) {
+      CountriesRequests.setCountryCurrency(
+          countries.where((p0) => p0.code == value).first.currencyCode!);
+    });
+  }
+
+  void getCountryCurrency() async {
+    isLoading.toggle();
+    prefferedCurreny.value = await CountriesRequests.getCountryCurrency();
     isLoading.toggle();
   }
 }

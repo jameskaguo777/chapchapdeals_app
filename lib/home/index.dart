@@ -3,7 +3,9 @@ import 'package:chapchapdeals_app/data/controller/countries.dart';
 import 'package:chapchapdeals_app/data/controller/posts_controller.dart';
 import 'package:chapchapdeals_app/data/model/categories.dart';
 import 'package:chapchapdeals_app/data/model/countries.dart';
+import 'package:chapchapdeals_app/widgets/post_card.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -23,14 +25,27 @@ class _HomeIndexState extends State<HomeIndex> {
       Get.put(CategoriesController());
   final CountriesController _countriesController = Get.find();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
+  final ScrollController _scrollController = ScrollController();
+  late int currentPage = 1;
   @override
   void initState() {
     super.initState();
     _categoriesController.getCategories();
     dropdownValue = _countriesController.prefferedCountry.value;
-    
-    _postsController.getPostsByLocation(dropdownValue);
+    _postsController.getPostsByLocationP(dropdownValue);
+    _scrollController.addListener(() {
+      if (_postsController.meta.value.lastPage != currentPage) {
+        if (_scrollController.position.pixels ==
+            _scrollController.position.maxScrollExtent) {
+          currentPage++;
+          _postsController.getPostByLocationWithPagination(dropdownValue,
+              page: currentPage);
+          if (kDebugMode) {
+            print('end of list current page $currentPage');
+          }
+        }
+      }
+    });
   }
 
   @override
@@ -80,13 +95,12 @@ class _HomeIndexState extends State<HomeIndex> {
                       color: Colors.green,
                     ));
                   } else {
-                    return _filterChips(
-                        _categoriesController.categories.reversed.toList());
+                    return _filterChips(_categoriesController.categories);
                   }
                 }),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(13.0, 8.0, 13.0, 13.0),
+                padding: const EdgeInsets.fromLTRB(13.0, 8.0, 13.0, 0.0),
                 child: Obx(() {
                   if (_countriesController.isLoading.value) {
                     return const Center(
@@ -100,7 +114,7 @@ class _HomeIndexState extends State<HomeIndex> {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(13.0, 8.0, 13.0, 13.0),
-                child: _categoriesItems(),
+                child: _obxPosts(),
               ),
             ]),
       ),
@@ -113,6 +127,17 @@ class _HomeIndexState extends State<HomeIndex> {
         child: ListView(
           scrollDirection: Axis.horizontal,
           children: [
+            Chip(
+              label: const Text('All'),
+              backgroundColor: Colors.grey[200],
+              side: BorderSide(
+                color: Colors.grey[300]!,
+                width: 1,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
             ...categoriesModelList.map((e) => Padding(
                   padding: const EdgeInsets.all(3.0),
                   child: Chip(
@@ -163,134 +188,49 @@ class _HomeIndexState extends State<HomeIndex> {
                 })),
       );
 
-  Widget _listItemCards() {
-    return SizedBox(
-      width: double.infinity,
-      height: 160,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: [
-          // ...listItemCards.map((e) => Padding(
-          //       padding: const EdgeInsets.all(3.0),
-          //       child: Card(
-          //         child: Column(
-          //           children: [
-          //             Image.asset(e.image),
-          //             Text(e.title),
-          //             Text(e.subtitle),
-          //           ],
-          //         ),
-          //       ),
-          //     )),
-        ],
-      ),
-    );
-  }
-
-  Widget _categoriesItems() {
-    return GetX<CategoriesController>(builder: (_) {
-      if (_categoriesController.isLoading.value) {
-        return const Center(child: CupertinoActivityIndicator());
+  Widget _obxPosts() {
+    return Obx(() {
+      if (_postsController.isLoading.value) {
+        return const Center(
+            child: CupertinoActivityIndicator(
+          color: Colors.green,
+        ));
       } else {
-        return ListView.builder(
-            itemCount: _categoriesController.categories.length,
-            scrollDirection: Axis.vertical,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (itemBuilder, index) {
-              CategoriesModel categoriesModel =
-                  _categoriesController.categories[index];
-              return _contentCategories(categoriesModel);
-              // return Obx(() {
-              //   _postsController.getPostsByCategoryLocation(
-              //       (categoriesModel.id.toString()),
-              //       _countriesController.prefferedCountry.value);
-              //   if (_postsController.isLoading.value) {
-              //     return const Center(
-              //         child: CupertinoActivityIndicator(
-              //       color: Colors.green,
-              //     ));
-              //   } else {
-
-              //   }
-              // });
-            });
+        return _postsController.posts.isEmpty
+            ? const Center(
+                child: Text('No Posts Found'),
+              )
+            : _gridPosts(_postsController.posts);
       }
     });
   }
 
-  Widget _contentCategories(CategoriesModel model) => SizedBox(
-        width: double.infinity,
-        height: 200,
-        child: Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(model.name!, style: Theme.of(context).textTheme.headline6),
-                TextButton(
-                    onPressed: () => null,
-                    child: Wrap(
-                      alignment: WrapAlignment.center,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: const [
-                        Text('See All'),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Icon(
-                          Icons.arrow_forward_ios,
-                          size: 15,
-                        ),
-                      ],
-                    )),
-              ],
-            ),
-            Obx(() {
-              if (_postsController.isLoading.value) {
-                return const Center(
-                    child: CupertinoActivityIndicator(
-                  color: Colors.green,
-                ));
-              } else {
-                List<PostsModel> listPostsModel = _postsController.posts
-                    .where((p0) => p0.cid == model.id.toString())
-                    .toList();
-
-                return SizedBox(
-                  width: double.infinity,
-                  height: 150,
-                  child: ListView.builder(
-                      key: widget.key,
-                      itemCount: listPostsModel.length,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          width: 150,
-                          height: 150,
-                          color: Colors.black,
-                          child: Text(listPostsModel[index].title!),
-                        );
-                      }),
-                );
-              }
-            }),
-          ],
+  Widget _gridPosts(List<PostsModel> listPostModal) => SizedBox(
+      width: double.infinity,
+      height: MediaQuery.of(context).size.height * 0.67,
+      child: GestureDetector(
+        child: GridView.builder(
+          shrinkWrap: true,
+          controller: _scrollController,
+          itemCount: _postsController.posts.length + 1,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              childAspectRatio: (1 / 1), crossAxisCount: 2),
+          itemBuilder: ((context, index) {
+            if (index == _postsController.posts.length) {
+              return Obx(() {
+                if (_postsController.isPaginationLoading.value || _postsController.meta.value.lastPage != currentPage) {
+                  return const CupertinoActivityIndicator();
+                } else {
+                  return const Center(
+                    child: Text('End of page'),
+                  );
+                }
+              });
+            }
+            return PostCard(
+                postsModel: listPostModal[index],
+                currency: _countriesController.prefferedCurreny.value);
+          }),
         ),
-      );
-
-  Widget _contentPost(PostsModel postModel) {
-    return Container(
-      width: 160,
-      height: 160,
-      color: Colors.black,
-      child: Column(
-        children: [
-          Text(postModel.title!),
-          Text(postModel.description!),
-        ],
-      ),
-    );
-  }
+      ));
 }

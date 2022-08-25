@@ -33,5 +33,13 @@ class CountriesRequests {
   static Future<bool> setPrefferedCountry(String country) async {
     return (await SharedPreferences.getInstance()).setString('country', country);
   }
+
+  static Future<bool> setCountryCurrency(String country) async {
+    return (await SharedPreferences.getInstance()).setString('currency', country);
+  }
+
+  static Future<String> getCountryCurrency() async{
+    return (await SharedPreferences.getInstance()).getString('currency') ?? '';
+  }
   
 }

@@ -18,6 +18,20 @@ class MyApp extends StatelessWidget {
       title: 'Chapchapdeals',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        colorScheme: const ColorScheme.light(
+          primary: Colors.green,
+          secondary: Colors.black,
+          surface: Colors.white,
+          background: Colors.grey,
+          error: Colors.red,
+          onPrimary: Colors.white,
+          onSecondary: Colors.white,
+          onSurface: Colors.black,
+          onBackground: Colors.black,
+          onError: Colors.white,
+          brightness: Brightness.light,
+        ),
       ),
       initialRoute: '/',
       routes: {

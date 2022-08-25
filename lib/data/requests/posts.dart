@@ -1,4 +1,5 @@
 import 'package:chapchapdeals_app/data/api.dart';
+import 'package:chapchapdeals_app/data/model/meta.dart';
 import 'package:chapchapdeals_app/data/model/posts.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -58,12 +59,12 @@ class PostRequests {
         throw Exception('Failed to load posts');
       }
     } catch (e) {
-      print(e);
+      
       return [];
     }
   }
 
-  static Future<List<PostsModel>> getPostsByLocationAndPagination(
+  static Future<List<dynamic>> getPostsByLocationWithPagination(
       String country, {int page = 1}) async {
     try {
       Response response = await Dio().get(
@@ -72,9 +73,9 @@ class PostRequests {
             + page.toString(),
       );
       if (response.data['success'] == true) {
-        return (response.data['result'] as List)
+        return [(response.data['result'] as List)
             .map((e) => PostsModel.fromJson(e as Map<String, dynamic>))
-            .toList();
+            .toList(), MetaModel.fromJson(response.data['meta'] as Map<String, dynamic>)];
       } else {
         throw Exception('Failed to load posts');
       }

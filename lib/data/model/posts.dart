@@ -8,6 +8,9 @@ class PostsModel {
   String? description;
   String? createdAt;
   String? address;
+  String? latitude;
+  String? longitude;
+  String? phone;
   List<PicturesModel>? images;
 
   PostsModel(
@@ -18,23 +21,28 @@ class PostsModel {
       this.images,
       this.postID,
       this.price,
-      this.title});
+      this.title,
+      this.phone,
+      this.latitude,
+      this.longitude});
 
   factory PostsModel.fromJson(Map<String, dynamic> json) {
     return PostsModel(
-      postID : json['postid'],
-    cid : json['cid'],
-    title : json['title'],
-    price : json['price'],
-    description : json['description'],
-    createdAt : json['created_at'],
-    address : json['address'],
-    images: json['picture'] != null
-        ? (json['picture'] as List)
-            .map((e) => PicturesModel.fromJson(e as Map<String, dynamic>))
-            .toList()
-        : null,
-    
+      postID: json['postid'],
+      cid: json['cid'],
+      title: json['title'],
+      price: json['price'],
+      description: json['description'],
+      createdAt: json['created_at'],
+      address: json['address'],
+      latitude: json['latitude'],
+      longitude: json['longitude'],
+      phone: json['phone'],
+      images: json['picture'] != null
+          ? (json['picture'] as List)
+              .map((e) => PicturesModel.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
     );
   }
 }
