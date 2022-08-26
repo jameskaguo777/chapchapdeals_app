@@ -218,7 +218,8 @@ class _HomeIndexState extends State<HomeIndex> {
           itemBuilder: ((context, index) {
             if (index == _postsController.posts.length) {
               return Obx(() {
-                if (_postsController.isPaginationLoading.value || _postsController.meta.value.lastPage != currentPage) {
+                if (_postsController.isPaginationLoading.value ||
+                    _postsController.meta.value.lastPage != currentPage) {
                   return const CupertinoActivityIndicator();
                 } else {
                   return const Center(
@@ -228,6 +229,12 @@ class _HomeIndexState extends State<HomeIndex> {
               });
             }
             return PostCard(
+                onClick: () {
+              
+                  Navigator.pushNamed(context, '/post',
+                      arguments:
+                          listPostModal[index]);
+                },
                 postsModel: listPostModal[index],
                 currency: _countriesController.prefferedCurreny.value);
           }),

@@ -1,4 +1,5 @@
 import 'package:chapchapdeals_app/home/index.dart';
+import 'package:chapchapdeals_app/post/index.dart';
 import 'package:flutter/material.dart';
 
 import 'initials/index.dart';
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Chapchapdeals',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
         colorScheme: const ColorScheme.light(
           primary: Colors.green,
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const InitialsIndex(),
         '/initials/country': (context) => const InitializeCountry(),
         '/home' :(context) => const HomeIndex(),
+        '/post': (context) => const PostView(),
       },
     );
   }
