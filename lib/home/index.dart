@@ -32,9 +32,15 @@ class _HomeIndexState extends State<HomeIndex> {
     super.initState();
     _categoriesController.getCategories();
     dropdownValue = _countriesController.prefferedCountry.value;
-    _postsController.getPostsByLocationP(dropdownValue);
+    if (_categoriesController.prefferedCategory.value == 'All') {
+      _postsController.getPostsByLocationP(dropdownValue);
+    } else {
+      _postsController.getPostsByCategoryLocation(
+          _categoriesController.prefferedCategory.value, dropdownValue);
+    }
     _scrollController.addListener(() {
-      if (_postsController.meta.value.lastPage != currentPage) {
+      if (_postsController.meta.value.lastPage != currentPage &&
+          _categoriesController.prefferedCategory.value == 'All') {
         if (_scrollController.position.pixels ==
             _scrollController.position.maxScrollExtent) {
           currentPage++;
@@ -51,6 +57,19 @@ class _HomeIndexState extends State<HomeIndex> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Drawer(
+          child: ListView(
+        children: const [
+          ListTile(
+            leading: Icon(Icons.message),
+            title: Text('Messages'),
+          ),
+          ListTile(
+            leading: Icon(Icons.account_circle),
+            title: Text('Profile'),
+          ),
+        ],
+      )),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -66,12 +85,18 @@ class _HomeIndexState extends State<HomeIndex> {
               hintText: 'Search...',
               hintStyle: Theme.of(context).textTheme.caption),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list, color: Colors.blueGrey),
-            onPressed: () {},
-          ),
-        ],
+        primary: true,
+        leadingWidth: 40,
+        leading: IconButton(
+            padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
+            iconSize: 37,
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+            icon: Icon(
+              CupertinoIcons.circle_grid_hex,
+              color: Theme.of(context).colorScheme.primary,
+            )),
       ),
       body: SingleChildScrollView(
         key: _scaffoldKey,
@@ -124,36 +149,72 @@ class _HomeIndexState extends State<HomeIndex> {
   Widget _filterChips(List<CategoriesModel> categoriesModelList) => SizedBox(
         width: double.infinity,
         height: 50,
-        child: ListView(
-          scrollDirection: Axis.horizontal,
-          children: [
-            Chip(
-              label: const Text('All'),
-              backgroundColor: Colors.grey[200],
-              side: BorderSide(
-                color: Colors.grey[300]!,
-                width: 1,
+        child: Obx(() {
+          return ListView(
+            scrollDirection: Axis.horizontal,
+            children: [
+              ActionChip(
+                onPressed: () {
+                  _categoriesController.prefferedCategory.value = 'All';
+                  _postsController
+                      .getPostByLocationWithPagination(dropdownValue);
+                },
+                label: Text(
+                  'All',
+                  style: _categoriesController.prefferedCategory.value == 'All'
+                      ? Theme.of(context).textTheme.caption!.copyWith(
+                          color: Theme.of(context).colorScheme.onPrimary)
+                      : Theme.of(context).textTheme.caption!.copyWith(
+                          color: Theme.of(context).colorScheme.onBackground),
+                ),
+                backgroundColor:
+                    _categoriesController.prefferedCategory.value == 'All'
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.background,
+                side: BorderSide(
+                  color: Colors.grey[300]!,
+                  width: 1,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            ...categoriesModelList.map((e) => Padding(
-                  padding: const EdgeInsets.all(3.0),
-                  child: Chip(
-                    label: Text(e.name!),
-                    backgroundColor: Colors.grey[200],
-                    side: BorderSide(
-                      color: Colors.grey[300]!,
-                      width: 1,
+              ...categoriesModelList.map((e) => Padding(
+                    padding: const EdgeInsets.all(3.0),
+                    child: ActionChip(
+                      onPressed: () {
+                        _categoriesController.prefferedCategory.value =
+                            e.translationOf!;
+                        _postsController.getPostsByCategoryLocation(
+                            e.translationOf!, dropdownValue);
+                      },
+                      label: Text(
+                        e.name!,
+                        style: _categoriesController.prefferedCategory.value ==
+                                e.translationOf
+                            ? Theme.of(context).textTheme.caption!.copyWith(
+                                color: Theme.of(context).colorScheme.onPrimary)
+                            : Theme.of(context).textTheme.caption!.copyWith(
+                                color:
+                                    Theme.of(context).colorScheme.onBackground),
+                      ),
+                      backgroundColor:
+                          _categoriesController.prefferedCategory.value ==
+                                  e.translationOf
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.background,
+                      side: BorderSide(
+                        color: Colors.grey[300]!,
+                        width: 1,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                )),
-          ],
-        ),
+                  )),
+            ],
+          );
+        }),
       );
 
   Widget _contentLocations(List<CountriesModel> countryModelList) => SizedBox(
@@ -219,7 +280,9 @@ class _HomeIndexState extends State<HomeIndex> {
             if (index == _postsController.posts.length) {
               return Obx(() {
                 if (_postsController.isPaginationLoading.value ||
-                    _postsController.meta.value.lastPage != currentPage) {
+                    _postsController.meta.value.lastPage != currentPage &&
+                        _categoriesController.prefferedCategory.value ==
+                            'All') {
                   return const CupertinoActivityIndicator();
                 } else {
                   return const Center(
@@ -230,10 +293,8 @@ class _HomeIndexState extends State<HomeIndex> {
             }
             return PostCard(
                 onClick: () {
-              
                   Navigator.pushNamed(context, '/post',
-                      arguments:
-                          listPostModal[index]);
+                      arguments: listPostModal[index]);
                 },
                 postsModel: listPostModal[index],
                 currency: _countriesController.prefferedCurreny.value);

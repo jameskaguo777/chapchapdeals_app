@@ -18,7 +18,7 @@ class PostCard extends StatelessWidget {
       child: InkWell(
         onTap: onClick,
         child: Card(
-          elevation: 3,
+          elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
             side: const BorderSide(
@@ -30,17 +30,24 @@ class PostCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.network(
-                '$domainUrl/storage/${postsModel.images![0].filename!}',
-                fit: BoxFit.cover,
-                width: MediaQuery.of(context).size.width * .4,
-                height: MediaQuery.of(context).size.width * .25,
-                errorBuilder: (context, error, stack) {
-                  return const Center(child: Icon(Icons.error));
-                },
-                loadingBuilder: (context, child, loadingProgress) {
-                  return Center(child: child);
-                },
+              ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20)
+                ),
+                clipBehavior: Clip.antiAliasWithSaveLayer,
+                child: Image.network(
+                  '$domainUrl/storage/${postsModel.images![0].filename!}',
+                  fit: BoxFit.cover,
+                  width: MediaQuery.of(context).size.width * .4,
+                  height: MediaQuery.of(context).size.width * .25,
+                  errorBuilder: (context, error, stack) {
+                    return const Center(child: Icon(Icons.error));
+                  },
+                  loadingBuilder: (context, child, loadingProgress) {
+                    return Center(child: child);
+                  },
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(8.0, 1.0, 1.0, 0.0),

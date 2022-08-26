@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 class CategoriesController extends GetxController {
   var categories = <CategoriesModel>[].obs;
   RxBool isLoading = false.obs;
+  RxString prefferedCategory = 'All'.obs;
 
   void getCategories() async {
     isLoading.toggle();

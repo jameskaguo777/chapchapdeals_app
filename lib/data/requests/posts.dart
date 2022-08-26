@@ -31,10 +31,6 @@ class PostRequests {
             .replaceAll('category', category),
       );
       if (response.data['success'] == true) {
-        if (kDebugMode) {
-          print(response.data['result']);
-        }
-
         return (response.data['result'] as List)
             .map((e) => PostsModel.fromJson(e as Map<String, dynamic>))
             .toList();
@@ -59,23 +55,24 @@ class PostRequests {
         throw Exception('Failed to load posts');
       }
     } catch (e) {
-      
       return [];
     }
   }
 
-  static Future<List<dynamic>> getPostsByLocationWithPagination(
-      String country, {int page = 1}) async {
+  static Future<List<dynamic>> getPostsByLocationWithPagination(String country,
+      {int page = 1}) async {
     try {
       Response response = await Dio().get(
-        postsByLocationAndPaginationUrl
-            .replaceAll('country', country)
-            + page.toString(),
+        postsByLocationAndPaginationUrl.replaceAll('country', country) +
+            page.toString(),
       );
       if (response.data['success'] == true) {
-        return [(response.data['result'] as List)
-            .map((e) => PostsModel.fromJson(e as Map<String, dynamic>))
-            .toList(), MetaModel.fromJson(response.data['meta'] as Map<String, dynamic>)];
+        return [
+          (response.data['result'] as List)
+              .map((e) => PostsModel.fromJson(e as Map<String, dynamic>))
+              .toList(),
+          MetaModel.fromJson(response.data['meta'] as Map<String, dynamic>)
+        ];
       } else {
         throw Exception('Failed to load posts');
       }

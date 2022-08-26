@@ -16,7 +16,6 @@ class PostsController extends GetxController {
   void getPostsByLocation(String country) async {
     isLoading.toggle();
     posts.value = await PostRequests.getPostsByLocation(country);
-
     isLoading.toggle();
   }
 
