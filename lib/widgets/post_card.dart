@@ -1,10 +1,12 @@
 import 'package:chapchapdeals_app/data/model/posts.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../data/api.dart';
 
 class PostCard extends StatelessWidget {
-  const PostCard({Key? key, required this.postsModel, required this.currency}) : super(key: key);
+  const PostCard({Key? key, required this.postsModel, required this.currency})
+      : super(key: key);
   final PostsModel postsModel;
   final String currency;
   @override
@@ -30,6 +32,16 @@ class PostCard extends StatelessWidget {
               fit: BoxFit.cover,
               width: MediaQuery.of(context).size.width * .4,
               height: MediaQuery.of(context).size.width * .25,
+              errorBuilder: (context, error, stack) {
+                return const Center(child: Icon(Icons.error));
+              },
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress!.cumulativeBytesLoaded ==
+                    loadingProgress.expectedTotalBytes) {
+                  return child;
+                }
+                return const Center(child: CupertinoActivityIndicator());
+              },
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 1.0, 1.0, 0.0),
@@ -60,7 +72,9 @@ class PostCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 1.0, 1.0, 0.0),
               child: Text(
-                  postsModel.price != null ? '$currency ${postsModel.price}' : 'Free',
+                  postsModel.price != null
+                      ? '$currency ${postsModel.price}'
+                      : 'Free',
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                   style: Theme.of(context).textTheme.caption!.copyWith(
