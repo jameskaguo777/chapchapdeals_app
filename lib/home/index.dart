@@ -9,8 +9,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../ad_helper.dart';
 import '../data/model/posts.dart';
 
 class HomeIndex extends StatefulWidget {
@@ -30,19 +32,15 @@ class _HomeIndexState extends State<HomeIndex> {
   final ScrollController _scrollController = ScrollController();
   late int currentPage = 1;
 
-  // static final AdRequest request = AdRequest(
-  //   keywords: <String>['foo', 'bar'],
-  //   contentUrl: 'http://foo.com/bar.html',
-  //   nonPersonalizedAds: true,
-  // );
-
-  // InterstitialAd? _interstitialAd;
-  // int _numInterstitialLoadAttempts = 0;
+  InterstitialAd? _interstitialAd;
+  bool _isInterstitialAdReady = false;
+  late PostsModel _tempoPostModel;
+  int clicksCounter = 0;
 
   @override
   void initState() {
     super.initState();
-
+    intestitialAdLoader();
     _categoriesController.getCategories();
     dropdownValue = _countriesController.prefferedCountry.value;
     if (_categoriesController.prefferedCategory.value == 'All') {
@@ -75,8 +73,8 @@ class _HomeIndexState extends State<HomeIndex> {
           child: ListView(
         children: [
           ListTile(
-            onTap: () => launchUrl(Uri.parse(domainUrl),
-                mode: LaunchMode.inAppWebView),
+            onTap: () =>
+                launchUrl(Uri.parse(domainUrl), mode: LaunchMode.inAppWebView),
             leading: const Icon(CupertinoIcons.person_alt_circle),
             title: const Text('Login to post Ad'),
           ),
@@ -317,8 +315,22 @@ class _HomeIndexState extends State<HomeIndex> {
             return PostCard(
                 onClick: () {
                   // _showInterstitialAd();
-                  Navigator.pushNamed(context, '/post',
-                      arguments: listPostModal[index]);
+                  setState(() {
+                    _tempoPostModel = listPostModal[index];
+                    clicksCounter++;
+                    if (clicksCounter > 5) {
+                      clicksCounter = 0;
+                      intestitialAdLoader();
+                    }
+                  });
+
+                  if (_interstitialAd != null && _isInterstitialAdReady) {
+                    _interstitialAd?.show();
+                    _interstitialAd = null;
+                  } else {
+                    Navigator.pushNamed(context, '/post',
+                        arguments: listPostModal[index]);
+                  }
                 },
                 postsModel: listPostModal[index],
                 currency: _countriesController.prefferedCurreny.value);
@@ -326,50 +338,27 @@ class _HomeIndexState extends State<HomeIndex> {
         ),
       ));
 
-  // void _createInterstitialAd() {
-  //   InterstitialAd.load(
-  //       adUnitId: Platform.isAndroid
-  //           ? 'ca-app-pub-3940256099942544/1033173712'
-  //           : 'ca-app-pub-3940256099942544/4411468910',
-  //       request: request,
-  //       adLoadCallback: InterstitialAdLoadCallback(
-  //         onAdLoaded: (InterstitialAd ad) {
-  //           print('$ad loaded');
-  //           _interstitialAd = ad;
-  //           _numInterstitialLoadAttempts = 0;
-  //           _interstitialAd!.setImmersiveMode(true);
-  //         },
-  //         onAdFailedToLoad: (LoadAdError error) {
-  //           print('InterstitialAd failed to load: $error.');
-  //           _numInterstitialLoadAttempts += 1;
-  //           _interstitialAd = null;
-  //           if (_numInterstitialLoadAttempts < 4) {
-  //             _createInterstitialAd();
-  //           }
-  //         },
-  //       ));
-  // }
+  void intestitialAdLoader() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.interstitialAdUnitId,
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          _isInterstitialAdReady = true;
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              Navigator.pushNamed(context, '/post', arguments: _tempoPostModel);
+            },
+          );
 
-  // void _showInterstitialAd() {
-  //   if (_interstitialAd == null) {
-  //     print('Warning: attempt to show interstitial before loaded.');
-  //     return;
-  //   }
-  //   _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
-  //     onAdShowedFullScreenContent: (InterstitialAd ad) =>
-  //         print('ad onAdShowedFullScreenContent.'),
-  //     onAdDismissedFullScreenContent: (InterstitialAd ad) {
-  //       print('$ad onAdDismissedFullScreenContent.');
-  //       ad.dispose();
-  //       _createInterstitialAd();
-  //     },
-  //     onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
-  //       print('$ad onAdFailedToShowFullScreenContent: $error');
-  //       ad.dispose();
-  //       _createInterstitialAd();
-  //     },
-  //   );
-  //   _interstitialAd!.show();
-  //   _interstitialAd = null;
-  // }
+          setState(() {
+            _interstitialAd = ad;
+          });
+        },
+        onAdFailedToLoad: (err) {
+          _isInterstitialAdReady = false;
+        },
+      ),
+    );
+  }
 }

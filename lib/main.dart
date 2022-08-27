@@ -1,14 +1,14 @@
 import 'package:chapchapdeals_app/home/index.dart';
 import 'package:chapchapdeals_app/post/index.dart';
 import 'package:flutter/material.dart';
-// import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'initials/index.dart';
 import 'initials/initial_country.dart';
 
 void main() {
-  // WidgetsFlutterBinding.ensureInitialized();
-  // MobileAds.instance.initialize();
+  WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   runApp(const MyApp());
 }
 

@@ -50,5 +50,7 @@
 		<string>sms</string>
 		<string>tel</string>
 	</array>
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-3038794138306316~6192906394</string>
 </dict>
 </plist>
