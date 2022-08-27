@@ -1,3 +1,4 @@
+import 'package:chapchapdeals_app/data/api.dart';
 import 'package:chapchapdeals_app/data/controller/categories_controller.dart';
 import 'package:chapchapdeals_app/data/controller/countries.dart';
 import 'package:chapchapdeals_app/data/controller/posts_controller.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../data/model/posts.dart';
 
@@ -27,9 +29,20 @@ class _HomeIndexState extends State<HomeIndex> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final ScrollController _scrollController = ScrollController();
   late int currentPage = 1;
+
+  // static final AdRequest request = AdRequest(
+  //   keywords: <String>['foo', 'bar'],
+  //   contentUrl: 'http://foo.com/bar.html',
+  //   nonPersonalizedAds: true,
+  // );
+
+  // InterstitialAd? _interstitialAd;
+  // int _numInterstitialLoadAttempts = 0;
+
   @override
   void initState() {
     super.initState();
+
     _categoriesController.getCategories();
     dropdownValue = _countriesController.prefferedCountry.value;
     if (_categoriesController.prefferedCategory.value == 'All') {
@@ -52,6 +65,7 @@ class _HomeIndexState extends State<HomeIndex> {
         }
       }
     });
+    // _createInterstitialAd();
   }
 
   @override
@@ -59,14 +73,18 @@ class _HomeIndexState extends State<HomeIndex> {
     return Scaffold(
       drawer: Drawer(
           child: ListView(
-        children: const [
+        children: [
           ListTile(
-            leading: Icon(Icons.message),
-            title: Text('Messages'),
+            onTap: () => launchUrl(Uri.parse(domainUrl),
+                mode: LaunchMode.inAppWebView),
+            leading: const Icon(CupertinoIcons.person_alt_circle),
+            title: const Text('Login to post Ad'),
           ),
           ListTile(
-            leading: Icon(Icons.account_circle),
-            title: Text('Profile'),
+            onTap: () => launchUrl(Uri.parse('$domainUrl/en/page/terms'),
+                mode: LaunchMode.inAppWebView),
+            leading: const Icon(CupertinoIcons.umbrella),
+            title: const Text('Terms & Privacy'),
           ),
         ],
       )),
@@ -87,16 +105,19 @@ class _HomeIndexState extends State<HomeIndex> {
         ),
         primary: true,
         leadingWidth: 40,
-        leading: IconButton(
-            padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
-            iconSize: 37,
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
-            icon: Icon(
-              CupertinoIcons.circle_grid_hex,
-              color: Theme.of(context).colorScheme.primary,
-            )),
+        leading: Builder(builder: (context) {
+          return IconButton(
+              padding: const EdgeInsets.fromLTRB(8.0, 0, 0, 0),
+              iconSize: 30,
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+              tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+              icon: Icon(
+                CupertinoIcons.circle_grid_3x3,
+                color: Theme.of(context).colorScheme.primary,
+              ));
+        }),
       ),
       body: SingleChildScrollView(
         key: _scaffoldKey,
@@ -232,7 +253,7 @@ class _HomeIndexState extends State<HomeIndex> {
             ),
             borderRadius: BorderRadius.circular(20),
             icon: const Icon(
-              Icons.arrow_downward_rounded,
+              CupertinoIcons.arrowtriangle_down_fill,
               color: Colors.green,
             ),
             isExpanded: true,
@@ -246,6 +267,8 @@ class _HomeIndexState extends State<HomeIndex> {
             onChanged: (String? newValue) => setState(() {
                   dropdownValue = newValue!;
                   _countriesController.setPrefferedCountry(dropdownValue);
+                  _postsController
+                      .getPostByLocationWithPagination(dropdownValue);
                 })),
       );
 
@@ -293,6 +316,7 @@ class _HomeIndexState extends State<HomeIndex> {
             }
             return PostCard(
                 onClick: () {
+                  // _showInterstitialAd();
                   Navigator.pushNamed(context, '/post',
                       arguments: listPostModal[index]);
                 },
@@ -301,4 +325,51 @@ class _HomeIndexState extends State<HomeIndex> {
           }),
         ),
       ));
+
+  // void _createInterstitialAd() {
+  //   InterstitialAd.load(
+  //       adUnitId: Platform.isAndroid
+  //           ? 'ca-app-pub-3940256099942544/1033173712'
+  //           : 'ca-app-pub-3940256099942544/4411468910',
+  //       request: request,
+  //       adLoadCallback: InterstitialAdLoadCallback(
+  //         onAdLoaded: (InterstitialAd ad) {
+  //           print('$ad loaded');
+  //           _interstitialAd = ad;
+  //           _numInterstitialLoadAttempts = 0;
+  //           _interstitialAd!.setImmersiveMode(true);
+  //         },
+  //         onAdFailedToLoad: (LoadAdError error) {
+  //           print('InterstitialAd failed to load: $error.');
+  //           _numInterstitialLoadAttempts += 1;
+  //           _interstitialAd = null;
+  //           if (_numInterstitialLoadAttempts < 4) {
+  //             _createInterstitialAd();
+  //           }
+  //         },
+  //       ));
+  // }
+
+  // void _showInterstitialAd() {
+  //   if (_interstitialAd == null) {
+  //     print('Warning: attempt to show interstitial before loaded.');
+  //     return;
+  //   }
+  //   _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+  //     onAdShowedFullScreenContent: (InterstitialAd ad) =>
+  //         print('ad onAdShowedFullScreenContent.'),
+  //     onAdDismissedFullScreenContent: (InterstitialAd ad) {
+  //       print('$ad onAdDismissedFullScreenContent.');
+  //       ad.dispose();
+  //       _createInterstitialAd();
+  //     },
+  //     onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+  //       print('$ad onAdFailedToShowFullScreenContent: $error');
+  //       ad.dispose();
+  //       _createInterstitialAd();
+  //     },
+  //   );
+  //   _interstitialAd!.show();
+  //   _interstitialAd = null;
+  // }
 }

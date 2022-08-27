@@ -32,20 +32,20 @@ class _InitialsIndexState extends State<InitialsIndex> {
           children: [
             Image.asset('assets/IMG_2753.PNG'),
             RichText(
-                text: const TextSpan(children: [
+                text: TextSpan(children: [
               TextSpan(
                 text: 'Chapchap',
                 style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
-                    color: Colors.green),
+                    color: Theme.of(context).colorScheme.primary),
               ),
               TextSpan(
                 text: 'deals',
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
-                  color: Colors.red,
+                  color: Theme.of(context).colorScheme.secondary,
                 ),
               ),
             ])),
