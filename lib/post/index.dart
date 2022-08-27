@@ -215,7 +215,10 @@ class _PostViewState extends State<PostView> {
 
   Widget _description(PostsModel postsModel) => Html(
       onLinkTap: ((url, context, attributes, element) {
-        launchUrl(Uri.parse(url!), mode: LaunchMode.inAppWebView);
+        launchUrl(
+          Uri.parse(url!), 
+          mode: LaunchMode.inAppWebView,
+          );
       }),
       data: postsModel.description);
 
