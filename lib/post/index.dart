@@ -140,6 +140,7 @@ class _PostViewState extends State<PostView> {
   }
 
   Widget _imageSlider(PostsModel post) => PageView(
+    key: widget.key,
         scrollDirection: Axis.horizontal,
         children: [
           ...post.images!
@@ -185,7 +186,7 @@ class _PostViewState extends State<PostView> {
                   ),
                   Text(
                     _categoriesController.categories
-                        .where((p0) => p0.id.toString() == postsModel.cid)
+                        .where((p0) => p0.translationOf == postsModel.cid)
                         .first
                         .name!,
                     style: Theme.of(context).textTheme.caption!.copyWith(

@@ -90,9 +90,15 @@ class _HomeIndexState extends State<HomeIndex> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: TextField(
+          keyboardType: TextInputType.name,
+          textInputAction: TextInputAction.search,
+          onSubmitted: (value) {
+            _categoriesController.prefferedCategory.value = 'Search';
+            _postsController.postSearchPost(value);
+          },
           decoration: InputDecoration(
               filled: true,
-              fillColor: Colors.grey[200],
+              fillColor: Theme.of(context).colorScheme.background,
               prefixIcon: const Icon(Icons.search),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(20),
@@ -134,9 +140,9 @@ class _HomeIndexState extends State<HomeIndex> {
                 padding: const EdgeInsets.fromLTRB(13.0, 0.0, 0.0, 8.0),
                 child: Obx(() {
                   if (_categoriesController.isLoading.value) {
-                    return const Center(
+                    return Center(
                         child: CupertinoActivityIndicator(
-                      color: Colors.green,
+                      color: Theme.of(context).colorScheme.primary,
                     ));
                   } else {
                     return _filterChips(_categoriesController.categories);
@@ -144,12 +150,12 @@ class _HomeIndexState extends State<HomeIndex> {
                 }),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(13.0, 8.0, 13.0, 0.0),
+                padding: const EdgeInsets.fromLTRB(13.0, 0.0, 13.0, 0.0),
                 child: Obx(() {
                   if (_countriesController.isLoading.value) {
-                    return const Center(
+                    return Center(
                         child: CupertinoActivityIndicator(
-                      color: Colors.green,
+                      color: Theme.of(context).colorScheme.primary,
                     ));
                   } else {
                     return _contentLocations(_countriesController.countries);
@@ -198,39 +204,44 @@ class _HomeIndexState extends State<HomeIndex> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              ...categoriesModelList.map((e) => Padding(
-                    padding: const EdgeInsets.all(3.0),
-                    child: ActionChip(
-                      onPressed: () {
-                        _categoriesController.prefferedCategory.value =
-                            e.translationOf!;
-                        _postsController.getPostsByCategoryLocation(
-                            e.translationOf!, dropdownValue);
-                      },
-                      label: Text(
-                        e.name!,
-                        style: _categoriesController.prefferedCategory.value ==
-                                e.translationOf
-                            ? Theme.of(context).textTheme.caption!.copyWith(
-                                color: Theme.of(context).colorScheme.onPrimary)
-                            : Theme.of(context).textTheme.caption!.copyWith(
-                                color:
-                                    Theme.of(context).colorScheme.onBackground),
-                      ),
-                      backgroundColor:
-                          _categoriesController.prefferedCategory.value ==
-                                  e.translationOf
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.background,
-                      side: BorderSide(
-                        color: Colors.grey[300]!,
-                        width: 1,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  )),
+              ...categoriesModelList
+                  .where((element) => element.picture != null)
+                  .map((e) => Padding(
+                        padding: const EdgeInsets.all(3.0),
+                        child: ActionChip(
+                          onPressed: () {
+                            _categoriesController.prefferedCategory.value =
+                                e.translationOf!;
+                            _postsController.getPostsByCategoryLocation(
+                                e.translationOf!, dropdownValue);
+                          },
+                          label: Text(
+                            e.name!,
+                            style: _categoriesController
+                                        .prefferedCategory.value ==
+                                    e.translationOf
+                                ? Theme.of(context).textTheme.caption!.copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary)
+                                : Theme.of(context).textTheme.caption!.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onBackground),
+                          ),
+                          backgroundColor:
+                              _categoriesController.prefferedCategory.value ==
+                                      e.translationOf
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context).colorScheme.background,
+                          side: BorderSide(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      )),
             ],
           );
         }),
@@ -292,6 +303,7 @@ class _HomeIndexState extends State<HomeIndex> {
       height: MediaQuery.of(context).size.height * 0.67,
       child: GestureDetector(
         child: GridView.builder(
+          key: widget.key,
           shrinkWrap: true,
           controller: _scrollController,
           itemCount: _postsController.posts.length + 1,
@@ -347,7 +359,10 @@ class _HomeIndexState extends State<HomeIndex> {
           _isInterstitialAdReady = true;
           ad.fullScreenContentCallback = FullScreenContentCallback(
             onAdDismissedFullScreenContent: (ad) {
-              Navigator.pushNamed(context, '/post', arguments: _tempoPostModel);
+              if (!_tempoPostModel.isBlank!) {
+                Navigator.pushNamed(context, '/post',
+                    arguments: _tempoPostModel);
+              }
             },
           );
 

@@ -49,4 +49,10 @@ class PostsController extends GetxController {
       String catID, String country) async {
     return await PostRequests.getPostsByLocationAndCategory(country, catID);
   }
+
+  void postSearchPost(String value) async {
+    isLoading.toggle();
+    posts.value = await PostRequests.postPostsSearch(value);
+    isLoading.toggle();
+  }
 }

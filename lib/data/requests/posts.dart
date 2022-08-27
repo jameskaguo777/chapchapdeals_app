@@ -80,4 +80,27 @@ class PostRequests {
       return [];
     }
   }
+
+  static Future<List<PostsModel>> postPostsSearch(
+    String query,
+  ) async {
+    try {
+      Map<String, String> data = {
+          'search' : query
+        };
+      Response response = await Dio().post(
+        searchPosts,
+        data: data
+      );
+      if (response.data['success'] == true) {
+        return (response.data['result'] as List)
+            .map((e) => PostsModel.fromJson(e as Map<String, dynamic>))
+            .toList();
+      } else {
+        throw Exception('Failed to load posts');
+      }
+    } catch (e) {
+      return [];
+    }
+  }
 }
