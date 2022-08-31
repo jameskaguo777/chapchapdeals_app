@@ -8,13 +8,13 @@ class AdHelper {
       if (kDebugMode) {
         return 'ca-app-pub-3940256099942544/6300978111';
       } else {
-        return 'ca-app-pub-3038794138306316/2462477156';
+        return 'ca-app-pub-xxxxxxxxxxxxxxxxxxxxxxxxxxx';
       }
     } else if (Platform.isIOS) {
       if (kDebugMode) {
         return 'ca-app-pub-3940256099942544/2934735716';
       } else {
-        return 'ca-app-pub-3038794138306316/8435926357';
+        return 'ca-app-pub-xxxxxxxxxxxxxxxxxxxxxxxxxxx';
       }
       
     } else {
@@ -27,14 +27,14 @@ class AdHelper {
       if (kDebugMode) {
         return "ca-app-pub-3940256099942544/1033173712";
       } else {
-        return "ca-app-pub-3038794138306316/7723936290";
+        return "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
       }
       
     } else if (Platform.isIOS) {
       if (kDebugMode) {
         return "ca-app-pub-3940256099942544/4411468910";
       } else {
-        return "ca-app-pub-3038794138306316/5145874411";
+        return "ca-app-pub-xxxxxxxxxxxxxxxxxxxxxxxxxxx";
       }
       
     } else {
